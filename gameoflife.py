@@ -1,11 +1,11 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
 Conway's Game of life
 """
 
-import pygame, time, random
+import pygame, random
 from optparse import OptionParser
 from sprites.boxes import Box
 from pygame.locals import *
@@ -16,6 +16,7 @@ DESCRIPTION = "Conway's Game of life"
 DEFAULT_HEIGHT = 40
 DEFAULT_WIDTH = 80
 DEFAULT_SIZE = 10
+DEFAULT_DELAY = 10
 CELL_DEAD = '.'
 CELL_LIVE = 'o'
 
@@ -50,19 +51,19 @@ def update_display(screen, board, boxes, options, rand_col = False, keep_backgro
 
     pygame.display.update()
 
+def borderless(pos, max):
+    if pos < 0:
+        pos = max + pos
+    elif pos >= max:
+        pos = abs(pos) % max
+    return pos
+
 def rules_of_life(board, options):
     """
     Rules of the games
     """
     total_pop = 0
     pop_list = [['0' for i in range(options.height)] for j in range(options.width)]
-
-    def borderless(pos, max):
-        if pos < 0:
-            pos = max + pos
-        elif pos >= max:
-            pos = abs(pos) % max
-        return pos
 
     for y in range(options.height):
         for x in range(options.width):
@@ -127,9 +128,26 @@ def main(options, args):
             if event.type == KEYDOWN and event.key == K_RETURN:
                 running = False
 
+            # set random glyders
             if event.type == KEYDOWN and event.key == K_r:
-                # set random
-                pass
+                for i in range(random.randint(10, 20)):
+                    sx = random.randint(0, options.width)
+                    sy = random.randint(0, options.height)
+
+                    if random.randint(0, 1) == 1:
+                        board[borderless(sx + 1, options.width)][borderless(sy + 0, options.height)] = CELL_LIVE
+                        board[borderless(sx + 2, options.width)][borderless(sy + 1, options.height)] = CELL_LIVE
+                        board[borderless(sx + 0, options.width)][borderless(sy + 2, options.height)] = CELL_LIVE
+                        board[borderless(sx + 1, options.width)][borderless(sy + 2, options.height)] = CELL_LIVE
+                        board[borderless(sx + 2, options.width)][borderless(sy + 2, options.height)] = CELL_LIVE
+                    else:
+                        board[borderless(sx + 1, options.width)][borderless(sy + 0, options.height)] = CELL_LIVE
+                        board[borderless(sx + 0, options.width)][borderless(sy + 1, options.height)] = CELL_LIVE
+                        board[borderless(sx + 0, options.width)][borderless(sy + 2, options.height)] = CELL_LIVE
+                        board[borderless(sx + 1, options.width)][borderless(sy + 2, options.height)] = CELL_LIVE
+                        board[borderless(sx + 2, options.width)][borderless(sy + 2, options.height)] = CELL_LIVE
+
+                update_display(screen, board, boxes, options)
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 button_down = True
@@ -165,13 +183,14 @@ def main(options, args):
 
         update_display(screen, board, boxes, options, rand_col=True, keep_background=keep_background)
         board = rules_of_life(board, options)
-        pygame.time.delay(10)
+        pygame.time.delay(options.delay)
 
 if __name__ == "__main__":
     parser = OptionParser(version=VERSION, description=DESCRIPTION)
     parser.add_option("--width", type="int", dest="width", default=DEFAULT_WIDTH, help="Field width")
     parser.add_option("--height", type="int", dest="height", default=DEFAULT_HEIGHT, help="Field height")
     parser.add_option("--size", type="int", dest="size", default=DEFAULT_SIZE, help="Cell size")
+    parser.add_option("--delay", type="int", dest="delay", default=DEFAULT_DELAY, help="Update delay")
     parser.add_option("--debug", action="store_true", dest="debug", help="Debug flag", default=False)
 
     (options, args) = parser.parse_args()
