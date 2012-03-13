@@ -1,5 +1,6 @@
-Set cells with the mouse and press *Enter* to start a game. You can set random glyders with *r* key. Press *Esc* to exit.
+Set cells with the mouse and press **Enter** to start a game. You can set random glyders with **r** key. Press **Esc** to exit.
 
+<pre>
 gameoflife.py --help
 
 Usage: gameoflife.py [options]
@@ -14,4 +15,5 @@ Options:
   --size=SIZE      Cell size
   --delay=DELAY    Update delay
   --debug          Debug flag
+</pre>
 
